@@ -4,9 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth', [
+            'except' => ['show', 'create', 'store','index']
+        ]);
+
+        $this->middleware('guest', [
+            'only' => ['create']
+        ]);
+    }
+
+    public function index()
+    {
+        $users = User::all();
+        return view('users.index', compact('users'));
+    }
+
+
     public function create()
     {
         return view('users.create');
@@ -32,7 +52,6 @@ class UsersController extends Controller
         ]);
         Auth::login($user);
         session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
-
         return redirect()->route('users.show', [$user]);
     }
 }
